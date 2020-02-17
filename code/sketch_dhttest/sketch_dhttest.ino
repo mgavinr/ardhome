@@ -2,6 +2,9 @@
 * Includes
 *---------------------------------------*/
 #include <DHT.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include "Adafruit_LEDBackpack.h"
 
 /*---------------------------------------
 * My objects
@@ -44,6 +47,75 @@ class myinDTemp {
     }
 };
 
+/*---------------------------------------*/
+class myoutSevenword {
+    Adafruit_AlphaNum4 _matrix = Adafruit_AlphaNum4();
+
+  public:
+    myoutSevenword()
+    {
+    }
+
+    ~myoutSevenword()
+    {
+    }
+
+    void setup() {
+      _matrix.begin(0x70);
+    }
+
+    void loop() {
+      _matrix.setBrightness(0);
+      _matrix.clear();
+      _matrix.writeDigitRaw(0, 0xFFFF); // 8
+      _matrix.writeDigitRaw(4, 0xFFFF); // 8
+      _matrix.writeDisplay();
+      delay(1500);
+      //
+      _matrix.writeDigitAscii(0, 't');
+      _matrix.writeDigitAscii(1, 'E');
+      _matrix.writeDigitAscii(2, ' ');
+      _matrix.writeDigitAscii(3, 'M');
+      _matrix.writeDigitAscii(4, 'P');
+      _matrix.writeDisplay();
+      delay(1500);
+    }
+
+    void debug() {
+      Serial.print("7segword");
+    }
+};
+class myoutSevennum {
+    Adafruit_7segment _matrix = Adafruit_7segment();
+
+  public:
+    myoutSevennum()
+    {
+    }
+
+    ~myoutSevennum()
+    {
+    }
+
+    void setup() {
+      _matrix.begin(0x70);
+    }
+
+    void loop() {
+      _matrix.print(1000, DEC);
+      _matrix.writeDisplay();
+      delay(1500);
+      _matrix.print(0xBEEF, HEX);
+      _matrix.writeDisplay();
+      delay(1500);
+    }
+
+    void debug() {
+      Serial.print("7seg");
+    }
+};
+
+/*---------------------------------------*/
 class myinButton {
     const byte _pin;
     int _state;
@@ -86,6 +158,8 @@ class myinButton {
 *---------------------------------------*/
 myinButton button(7);
 myinDTemp dtemp(8);
+//myoutSevennum seven;
+myoutSevenword sevenword;
 
 /*---------------------------------------
 * Code
@@ -94,11 +168,17 @@ void setup() {
   Serial.begin(9600);
   button.setup();
   dtemp.setup();
+  //seven.setup();
+  sevenword.setup();
 }
 
 void loop() {
   button.loop();
   dtemp.loop();
   dtemp.debug();
-  delay(10000); //Delay 2 sec. 
+  //seven.loop();
+  //seven.debug();
+  sevenword.loop();
+  sevenword.debug();
+  delay(1000); //Delay 2 sec. 
 }

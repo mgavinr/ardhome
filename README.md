@@ -43,10 +43,12 @@ Analog In Pins 0-5 (light blue)
 
 # PWM
 
+```
 pinMode(led_pin, OUTPUT);
 analogWrite(led_pin, 0) means a signal of 0% duty cycle. OFF
 analogWrite(led_pin, 127) means a signal of 50% duty cycle. 50/50
 analogWrite(led_pin, 255) means a signal of 100% duty cycle. ON
+```
 
 README.md 
 ============
