@@ -1,4 +1,4 @@
 # ardhome
-arduino stuff
-[Partlist Instructions](docs/PARTLIST.md)
-[Project Instructions](docs/PROJECTLIST.md)
+
+1. [Partlist Instructions](docs/PARTLIST.md)
+2. [Project Instructions](docs/PROJECTLIST.md)
