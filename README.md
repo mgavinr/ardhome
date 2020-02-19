@@ -40,6 +40,9 @@ Digial Pin 13
 - when high led is also high
 
 Analog In Pins 0-5 (light blue) 
+Analog Pins 4 5
+- I2C 4=SDA 5=SCL
+- I2C XTR=SDA XTR-1=SCL = 18=SDA 19=SCL  .. maybe they are duplicates for handyness .. seems for shields
 
 # PWM
 
