@@ -34,6 +34,7 @@ class myinDTemp {
     void setup() {
       _matrix.begin(0x70);
       _matrix.clear();
+      _matrix.setBrightness(2); // 10
       _matrix.writeDisplay();
       pinMode(_pin, INPUT_PULLUP);
       _dht = new DHT(_pin, _dht_type);
@@ -54,7 +55,7 @@ class myinDTemp {
       // B   C
       // DDDDD
       // E   F
-      // GGGGG
+      // GGGGG .
       //_matrix.writeDigitRaw(1, (uint8_t)0b.BDEGFCA);
       _matrix.writeDigitRaw(1,   (uint8_t)0b01110100);
       _matrix.writeDigitRaw(2, (uint8_t)0b11111111);
