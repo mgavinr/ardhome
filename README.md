@@ -54,6 +54,9 @@ analogWrite(led_pin, 255) means a signal of 100% duty cycle. ON
 ```
 IIC I2C
 =======
+SDA = serial data
+SCL = serial clock 
+i will never remember these accrs
 
 ```
           0v        0v
