@@ -57,6 +57,8 @@ You can also use the other class, alpha though its a bit strange for numbers, i 
 
 2 colour red and black e-paper.
 
+For a colour byte there is something to do with 0x80
+
 Note: Because of the small RAM of Arduino, it cannot support drawing function, therefore, we only provide image display function. The image data are stored in flash. 
 
 It is not the V2 one 
@@ -101,11 +103,11 @@ You need to create the library directory manually by copying over only the requi
 ```
 To draw you need to use windows to update the full memory of the device as ard has very little memory for 1 full global array of picture data .. 
 
-#define EPD_WIDTH       104
-#define EPD_HEIGHT      212
+#define EPD_WIDTH       104 (coords)
+#define EPD_HEIGHT      212 (coords)
 
 // creating dots and fonts
-Paint(unsigned char* image, int width, int height);
+Paint(unsigned char* image, int width(coords), int height(coords));
   void DrawAbsolutePixel(int x, int y, int colored);
   void DrawPixel(int x, int y, int colored);
   void DrawCharAt(int x, int y, char ascii_char, sFONT* font, int colored); // words

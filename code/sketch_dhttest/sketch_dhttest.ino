@@ -122,53 +122,40 @@ class myoutPaper {
         * update a partial display several times.
         * 1 byte = 8 pixels, therefore you have to set 8*N pixels at a time.
         */
-      unsigned char image[1024];
-      Paint paint(image, 128, 18); // width should be the multiple of 8 , width, height
+      // max x/width/depth 104,  max y/height/length 212
+      // 8y * 26 = 212
+      // bytes not coords i.e. it is *8 for number of coords, 6656 pixels
+      // 13 bytes is one line, 104
+      // there are 
 
-      paint.Clear(UNCOLORED);
-      paint.Clear(COLORED);
-      paint.DrawStringAt(8, 2, "e-Paper Demo", &Font12, COLORED);
-      _epd.SetPartialWindowBlack(paint.GetImage(), 0, 8, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper1 bw");   
+      /*
+       * Title - Y axis
+       */
+      unsigned char image[13*26];  //1/4 image
+      memset(image, 0x00, sizeof(image)); // fill solid
+      Paint paint(image, 104, 26); // width,height
+      paint.DrawStringAt(10, 5, "TEMPERATURE", &Font12, UNCOLORED); // indented in 8 (0-104) and down 2 (0-53)
+      _epd.SetPartialWindowRed(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight()); //1
+      memset(image, 0xFF, sizeof(image)); // fill empty
+      paint.DrawStringAt(10, 5, "TEMPERATURE", &Font12, COLORED); // indented in 8 (0-104) and down 2 (0-53)
+      _epd.SetPartialWindowBlack(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight()); //1
 
-      paint.DrawStringAt(8, 2, "Hello world", &Font12, UNCOLORED);
-      _epd.SetPartialWindowRed(paint.GetImage(), 0, 24, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper2 color");   
-      
-      paint.SetWidth(64);
-      paint.SetHeight(64);
-
-      paint.Clear(UNCOLORED);
-      paint.DrawRectangle(0, 0, 40, 50, COLORED);
-      paint.DrawLine(0, 0, 40, 50, COLORED);
-      paint.DrawLine(40, 0, 0, 50, COLORED);
-      _epd.SetPartialWindowBlack(paint.GetImage(), 8, 72, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper3 bw");   
-      
-      paint.Clear(UNCOLORED);
-      paint.DrawCircle(16, 16, 15, COLORED);
-      _epd.SetPartialWindowBlack(paint.GetImage(), 64, 72, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper4 bw");   
-
-      paint.Clear(UNCOLORED);
-      paint.DrawFilledRectangle(0, 0, 40, 50, COLORED);
-      _epd.SetPartialWindowRed(paint.GetImage(), 8, 144, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper5 bw");   
-
-      paint.Clear(UNCOLORED);
-      paint.DrawFilledCircle(16, 16, 15, COLORED);
-      _epd.SetPartialWindowRed(paint.GetImage(), 64, 144, paint.GetWidth(), paint.GetHeight());
-      Serial.println("Paper6 bw");   
-
-      /* This displays the data from the SRAM in e-Paper module */
+      /*
+       * Data
+       */
+      unsigned char image2[13*26];  //1/4 image
+      memset(image2, 0x00, sizeof(image2)); // fill solid
+      Paint paint2(image2, 104, 26); // width,height
+      //paint2.SetRotate(ROTATE_90);
+      paint2.DrawStringAt(10, 5, "TIME", &Font12, UNCOLORED); // indented in 8 (0-104) and down 2 (0-53)
+      _epd.SetPartialWindowRed(paint2.GetImage(), 0, 100, paint.GetWidth(), paint.GetHeight()); //1
+      memset(image2, 0xFF, sizeof(image2)); // fill empty
+      paint2.DrawStringAt(10, 5, "TIME", &Font12, COLORED); // indented in 8 (0-104) and down 2 (0-53)
+      _epd.SetPartialWindowBlack(paint2.GetImage(), 0, 100, paint.GetWidth(), paint.GetHeight()); //1
+       /* 
+        * Display
+        */
       _epd.DisplayFrame();
-      Serial.println("DISPLAY IMAGE 1");   
-
-      /* This displays an image */
-      _epd.DisplayFrame(IMAGE_BLACK, IMAGE_RED);
-      Serial.println("DISPLAY IMAGE 2");   
-
-      /* Deep sleep */
       _epd.Sleep();
     }
 
