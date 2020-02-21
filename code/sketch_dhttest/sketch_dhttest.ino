@@ -5,6 +5,13 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
+#include <SPI.h>
+#include "epd2in13b.h"
+#include "imagedata.h"
+#include "epdpaint.h"
+
+#define COLORED     0
+#define UNCOLORED   1
 
 /*---------------------------------------
 * My objects
@@ -83,23 +90,118 @@ class myinDTemp {
     }
 };
 
+class myoutPaper {
+  Epd _epd;
+  boolean _init;
+
+  public:
+    myoutPaper() : 
+      _init(false)
+    {
+    }
+
+    ~myoutPaper()
+    {
+    }
+
+    void setup() {
+      Epd _epd;
+
+      if (_epd.Init() != 0) {
+        Serial.print("e-Paper init failed");
+        return;
+      }
+      _init = true;
+
+      /* This clears the SRAM of the e-paper display */
+      _epd.ClearFrame();
+
+      /**
+        * Due to RAM not enough in Arduino UNO, a frame buffer is not allowed.
+        * In this case, a smaller image buffer is allocated and you have to 
+        * update a partial display several times.
+        * 1 byte = 8 pixels, therefore you have to set 8*N pixels at a time.
+        */
+      unsigned char image[1024];
+      Paint paint(image, 128, 18); // width should be the multiple of 8 , width, height
+
+      paint.Clear(UNCOLORED);
+      paint.Clear(COLORED);
+      paint.DrawStringAt(8, 2, "e-Paper Demo", &Font12, COLORED);
+      _epd.SetPartialWindowBlack(paint.GetImage(), 0, 8, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper1 bw");   
+
+      paint.DrawStringAt(8, 2, "Hello world", &Font12, UNCOLORED);
+      _epd.SetPartialWindowRed(paint.GetImage(), 0, 24, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper2 color");   
+      
+      paint.SetWidth(64);
+      paint.SetHeight(64);
+
+      paint.Clear(UNCOLORED);
+      paint.DrawRectangle(0, 0, 40, 50, COLORED);
+      paint.DrawLine(0, 0, 40, 50, COLORED);
+      paint.DrawLine(40, 0, 0, 50, COLORED);
+      _epd.SetPartialWindowBlack(paint.GetImage(), 8, 72, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper3 bw");   
+      
+      paint.Clear(UNCOLORED);
+      paint.DrawCircle(16, 16, 15, COLORED);
+      _epd.SetPartialWindowBlack(paint.GetImage(), 64, 72, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper4 bw");   
+
+      paint.Clear(UNCOLORED);
+      paint.DrawFilledRectangle(0, 0, 40, 50, COLORED);
+      _epd.SetPartialWindowRed(paint.GetImage(), 8, 144, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper5 bw");   
+
+      paint.Clear(UNCOLORED);
+      paint.DrawFilledCircle(16, 16, 15, COLORED);
+      _epd.SetPartialWindowRed(paint.GetImage(), 64, 144, paint.GetWidth(), paint.GetHeight());
+      Serial.println("Paper6 bw");   
+
+      /* This displays the data from the SRAM in e-Paper module */
+      _epd.DisplayFrame();
+      Serial.println("DISPLAY IMAGE 1");   
+
+      /* This displays an image */
+      _epd.DisplayFrame(IMAGE_BLACK, IMAGE_RED);
+      Serial.println("DISPLAY IMAGE 2");   
+
+      /* Deep sleep */
+      _epd.Sleep();
+    }
+
+    void loop() {
+    }
+
+    void debug() {
+      Serial.print("Paper was initialised: ");Serial.print(_init);
+      Serial.println(" ");   
+    }
+};
+
 /*---------------------------------------
 * My vars
 *---------------------------------------*/
-myinDTemp dtemp(8);
+//myinDTemp dtemp(2);
+myoutPaper paper;
 
 /*---------------------------------------
 * Code
 *---------------------------------------*/
 void setup() {
   Serial.begin(9600);
-  
-  dtemp.setup();
+  //dtemp.setup();
+  paper.setup();
+  paper.loop();
 }
 
 void loop() {
  
-  dtemp.loop();
-  dtemp.debug();
+  //dtemp.loop();
+  //dtemp.debug();
+  //paper.loop();
+  paper.debug();
   delay(5000); //Delay 2 sec. 
 }

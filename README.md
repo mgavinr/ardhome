@@ -52,6 +52,59 @@ analogWrite(led_pin, 0) means a signal of 0% duty cycle. OFF
 analogWrite(led_pin, 127) means a signal of 50% duty cycle. 50/50
 analogWrite(led_pin, 255) means a signal of 100% duty cycle. ON
 ```
+
+Memory
+=======
+PROGMEM stores in PROGMEM ahahaha ha thanks, Please note that variables must be either globally defined, OR defined with the static keyword, in order to work with PROGMEM.
+
+You can use this for strings to serial anyway .. Serial.print(F("Write something on the Serial Monitor that is stored in FLASH"));
+
+You can use this for anything that does not change..
+
+Here we go ..
+
+# PROGMEM
+
+Flash memory is used to store your program image and any initialized data. You can execute program code from flash,but you can't modify data in flash memory from your executing code. To modify the data, it must first be copied intoSRAMFlash memory is the same technology used for thumb-drives and SD cards. It is non-volatile, so your program will stillbe there when the system is powered off.
+
+# SRAM
+
+stack vars, global vars, static vars live here.
+
+# EEPROM
+
+It's a bit slower than SRAM 1 byte at a time.  You can use apis for it.  I guess handy to store stuff between restarts?
+
+# LIMITS
+
+```
+Flash, SRAM, EEPROM
+Uno:  32k, 2k, 1k  
+Mega: 256k, 8k, 4k
+```
+
+```
+0x0..0xFF = 0 to 256
+0xFF = 1111 1111 = 1 byte
+1024 bytes = 1k
+
+boolean       = 1 byte = true(1) or false(0)
+char          = 1 byte = -128 .. 127
+unsgined char = 1 byte = 0 .. 255
+byte          = 1 byte = 0 .. 255
+uint8_t       = 1 byte = 0 .. 255
+int           = 2 byte = +-32,000
+short         = 2 byte = +-32,000
+unsigned int  = 2 byte = 0 .. 65000
+word          = 2 byte = 0 .. 65000
+uint16_t      = 2 byte = 0 .. 65000
+long          = 4 byte = +-2,000,000
+unsigned long = 4 byte = 0 .. 4,000,000
+uint32_t      = 4 byte = 0 .. 4,000,000
+float         = 4 byte = +- something oh dear
+double        = 4 byte = +- something oh dear
+```
+
 IIC I2C
 =======
 SDA = serial data
