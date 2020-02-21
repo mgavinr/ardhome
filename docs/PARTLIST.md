@@ -64,6 +64,9 @@ Note: Because of the small RAM of Arduino, it cannot support drawing function, t
 It is not the V2 one 
 
 ```
+blue pins summary: swapped for added brilliance: orange black, 13, 11 10 9 8 7
+
+```
 Pins
 
 Vcc 	 5V or 3.3v preferably?
