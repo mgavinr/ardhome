@@ -166,3 +166,19 @@ void SetPartialWindowRed(const unsigned char* buffer_red, int x, int y, int w, i
 void DisplayFrame(const unsigned char* frame_buffer_black, const unsigned char* frame_buffer_red);
 void DisplayFrame(void);
 ```
+
+I'll come back to that, when i do a simulator
+
+### Temperature Sensor - Waterproof (DS18B20) (SEN-11050) 
+
+This is a very simple temp sensor.  Oh wait.  Good for busters..  I will figure it out one day.
+
+An extremely detailed spec is http://dlnmh9ip6v2uc.cloudfront.net/datasheets/Sensors/Temp/DS18B20.pdf
+One library is https://github.com/PaulStoffregen/OneWire.git
+
+It has lots of code for all steps, i must write my own one.. with more comments.
+
+
+
+
+
