@@ -63,7 +63,6 @@ Note: Because of the small RAM of Arduino, it cannot support drawing function, t
 
 It is not the V2 one 
 
-```
 blue pins summary: swapped for added brilliance: orange black, 13, 11 10 9 8 7
 
 ```
@@ -177,8 +176,3 @@ An extremely detailed spec is http://dlnmh9ip6v2uc.cloudfront.net/datasheets/Sen
 One library is https://github.com/PaulStoffregen/OneWire.git
 
 It has lots of code for all steps, i must write my own one.. with more comments.
-
-
-
-
-
