@@ -156,10 +156,12 @@ So you could probably ignore that.
 
 Some more info:
 
-start signal high time
-start signal low time
-bit high time
-bit low time
+start signal high time / start high/long duration
+start signal low time / start low/short duration
+bit high time / logic long duration
+bit low time / logic short duration
+
+whatever they are it seems they are needed, strange, anyway you don't need to send the msg twice, phew
 
 
 README.md 

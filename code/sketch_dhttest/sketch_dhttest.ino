@@ -137,6 +137,7 @@ class myinoutIR {
         if (IR.IsDta()) {               // get IR data
             // TODO some devices send the same code twice
             IR.Recv(dta);               // receive data to dta
+            
             if (dta[BIT_DATA_LEN] == 4) {
               ir_device = (dta[BIT_DATA+1] + (dta[BIT_DATA+0] << 8)) & (0x0000FFFF);
               ir_button = (dta[BIT_DATA+3] + (dta[BIT_DATA+2] << 8)) & (0x0000FFFF);
@@ -148,9 +149,44 @@ class myinoutIR {
             Serial.print("IR device=0x"); Serial.print(ir_device, HEX);
             Serial.print(" IR group="); Serial.print(ir_group, HEX);
             Serial.print(" IR button=0x"); Serial.println((unsigned long)ir_button, HEX);
+            debug(dta);
         } 
       }
       Serial.println("Finished Checking for IR messages");
+    }
+
+    void debug(unsigned char* dta) {
+        Serial.println("+------------------------------------------------------+");
+        Serial.print("LEN = ");
+        Serial.println(dta[BIT_LEN]);
+        Serial.print("START_H: ");
+        Serial.print(dta[BIT_START_H]);
+        Serial.print("\tSTART_L: ");
+        Serial.println(dta[BIT_START_L]);
+
+        Serial.print("DATA_H: ");
+        Serial.print(dta[BIT_DATA_H]);
+        Serial.print("\tDATA_L: ");
+        Serial.println(dta[BIT_DATA_L]);
+
+        Serial.print("\r\nDATA_LEN = ");
+        Serial.println(dta[BIT_DATA_LEN]);
+
+        Serial.print("DATA: ");
+        for (int i = 0; i < dta[BIT_DATA_LEN]; i++) {
+            Serial.print("0x");
+            Serial.print(dta[i + BIT_DATA], HEX);
+            Serial.print("\t");
+        }
+        Serial.println();
+
+        Serial.print("DATA: ");
+        for (int i = 0; i < dta[BIT_DATA_LEN]; i++) {
+            Serial.print(dta[i + BIT_DATA], DEC);
+            Serial.print("\t");
+        }
+        Serial.println();
+        Serial.println("+------------------------------------------------------+\r\n\r\n");
     }
 
     void send() {
