@@ -88,21 +88,23 @@ Mega: 256k, 8k, 4k
 0xFF = 1111 1111 = 1 byte
 1024 bytes = 1k
 
-boolean       = 1 byte = true(1) or false(0)
-char          = 1 byte = -128 .. 127
-unsgined char = 1 byte = 0 .. 255
-byte          = 1 byte = 0 .. 255
-uint8_t       = 1 byte = 0 .. 255
-int           = 2 byte = +-32,000
-short         = 2 byte = +-32,000
-unsigned int  = 2 byte = 0 .. 65000
-word          = 2 byte = 0 .. 65000
-uint16_t      = 2 byte = 0 .. 65000
-long          = 4 byte = +-2,000,000
-unsigned long = 4 byte = 0 .. 4,000,000
-uint32_t      = 4 byte = 0 .. 4,000,000
-float         = 4 byte = +- something oh dear
-double        = 4 byte = +- something oh dear
+boolean       0xFF = 1 byte = true(1) or false(0) 
+char          0xFF = 1 byte = -128 .. 127
+unsgined char 0xFF = 1 byte = 0 .. 255
+byte          0xFF = 1 byte = 0 .. 255
+uint8_t       0xFF = 1 byte = 0 .. 255
+
+int           0xFFFF = 2 byte = +-32,000
+short         0xFFFF = 2 byte = +-32,000
+unsigned int  0xFFFF = 2 byte = 0 .. 65000
+word          0xFFFF = 2 byte = 0 .. 65000
+uint16_t      0xFFFF = 2 byte = 0 .. 65000
+
+long          0xFFFF-FFFF = 4 byte = +-2,000,000
+unsigned long 0xFFFF-FFFF = 4 byte = 0 .. 4,000,000
+uint32_t      0xFFFF-FFFF = 4 byte = 0 .. 4,000,000
+float         0xFFFF-FFFF = 4 byte = +- something oh dear
+double        0xFFFF-FFFF = 4 byte = +- something oh dear
 ```
 
 IIC I2C
