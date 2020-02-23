@@ -10,9 +10,18 @@
 #include "imagedata.h"
 #include "epdpaint.h"
 #include <OneWire.h>
+#include <IRSendRev.h>
 
 #define COLORED     0
 #define UNCOLORED   1
+
+#define BIT_LEN         0
+#define BIT_START_H     1
+#define BIT_START_L     2
+#define BIT_DATA_H      3
+#define BIT_DATA_L      4
+#define BIT_DATA_LEN    5
+#define BIT_DATA        6
 
 /*
  * Arduino uno: pin 2 temp, pin A4 A5 led, pin 4 water temp, pin 13 11 10 9 8 7 paper 
@@ -93,6 +102,53 @@ class myinDTemp {
     void debug() {
       Serial.print("Temperature=");Serial.print(_temperature);
       Serial.print(" Humidity=");Serial.println(_humidity);   
+    }
+};
+
+class myinIR {
+    const byte _pin;
+
+  public:
+    myinIR(byte attachTo) :
+      _pin(attachTo)
+    {
+    }
+
+    ~myinIR()
+    {
+    }
+
+    void setup() {
+      IR.Init(_pin);
+    } 
+    void loop(unsigned long milliseconds) {
+      unsigned long beg_milliseconds = millis();
+      unsigned long cur_milliseconds = millis();
+      unsigned char dta[20];
+
+      Serial.println("Checking for IR messages:");
+      while((cur_milliseconds - beg_milliseconds) < milliseconds) {
+        cur_milliseconds = millis();
+        unsigned long ir_device = 0;
+        unsigned long ir_button = 0;
+        unsigned long ir_group = 0;
+        if (IR.IsDta()) {               // get IR data
+            // TODO some devices send the same code twice
+            IR.Recv(dta);               // receive data to dta
+            if (dta[BIT_DATA_LEN] == 4) {
+              ir_device = (dta[BIT_DATA+1] + (dta[BIT_DATA+0] << 8)) & (0x0000FFFF);
+              ir_button = (dta[BIT_DATA+3] + (dta[BIT_DATA+2] << 8)) & (0x0000FFFF);
+            } else if (dta[BIT_DATA_LEN] == 6) {
+              ir_device = (dta[BIT_DATA+1] + (dta[BIT_DATA+0] << 8)) & (0x0000FFFF);
+              ir_group  = (dta[BIT_DATA+3] + (dta[BIT_DATA+2] << 8)) & (0x0000FFFF);
+              ir_button = (dta[BIT_DATA+5] + (dta[BIT_DATA+4] << 8)) & (0x0000FFFF);
+            }
+            Serial.print("IR device=0x"); Serial.print(ir_device, HEX);
+            Serial.print(" IR group="); Serial.print(ir_group, HEX);
+            Serial.print(" IR button=0x"); Serial.println((unsigned long)ir_button, HEX);
+        } 
+      }
+      Serial.println("Finished Checking for IR messages");
     }
 };
 
@@ -318,8 +374,9 @@ class myinWatertemp {
 * My vars
 *---------------------------------------*/
 myinDTemp dtemp(2);
-myoutPaper paper;
+//myoutPaper paper;
 myinWatertemp watertemp(4);
+myinIR ir(3);
 
 /*---------------------------------------
 * Code
@@ -327,13 +384,15 @@ myinWatertemp watertemp(4);
 void setup() {
   Serial.begin(9600);
   dtemp.setup();
-  paper.setup(false); // does everything, false => skip
+  //paper.setup(false); // does everything, false => skip
   watertemp.setup();
+  ir.setup();
 }
 
 void loop() {
   dtemp.loop();
-  paper.loop(); // nothing
+  //paper.loop(); // nothing
   watertemp.loop();
+  ir.loop(50000);
   delay(5000); //Delay 2 sec. 
 }

@@ -176,3 +176,64 @@ An extremely detailed spec is http://dlnmh9ip6v2uc.cloudfront.net/datasheets/Sen
 One library is https://github.com/PaulStoffregen/OneWire.git
 
 It has lots of code for all steps, i must write my own one.. with more comments.
+
+### IR Receiver 38Khz - 45m range && Grove IR Emitter 10m range
+
+```
+Pins : Looking at it:  Left=Data M=+5v Right=GND
+           Behind it:  Left=GND M=+5v Right=Data
+Pins : Looking at it:  Left=TX NC +5v Gnd
+           Behind it:  Left=GND +5v NC TX
+```
+
+```
+Code
+There are a few libs, this maybe the one to go for as it supports the IR send too.  
+However it's not as easy to use.
+git clone https://github.com/Seeed-Studio/IRSendRev.git
+
+// setup
+#include <IRSendRev.h>
+IR.Init(3);
+
+// code
+unsigned char dta[20];
+
+// lots now ..
+  if (IR.IsDta()) {               // get IR data
+        IR.Recv(dta);               // receive data to dta
+
+        Serial.println("+------------------------------------------------------+");
+        Serial.print("LEN = ");
+        Serial.println(dta[BIT_LEN]);
+        Serial.print("START_H: ");
+        Serial.print(dta[BIT_START_H]);
+        Serial.print("\tSTART_L: ");
+        Serial.println(dta[BIT_START_L]);
+
+        Serial.print("DATA_H: ");
+        Serial.print(dta[BIT_DATA_H]);
+        Serial.print("\tDATA_L: ");
+        Serial.println(dta[BIT_DATA_L]);
+
+        Serial.print("\r\nDATA_LEN = ");
+        Serial.println(dta[BIT_DATA_LEN]);
+
+        Serial.print("DATA: ");
+        for (int i = 0; i < dta[BIT_DATA_LEN]; i++) {
+            Serial.print("0x");
+            Serial.print(dta[i + BIT_DATA], HEX);
+            Serial.print("\t");
+        }
+        Serial.println();
+
+        Serial.print("DATA: ");
+        for (int i = 0; i < dta[BIT_DATA_LEN]; i++) {
+            Serial.print(dta[i + BIT_DATA], DEC);
+            Serial.print("\t");
+        }
+        Serial.println();
+        Serial.println("+------------------------------------------------------+\r\n\r\n");
+    }
+
+```

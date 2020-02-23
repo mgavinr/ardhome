@@ -121,6 +121,38 @@ ARD =========================/\/\/===5V
 
 The I2C bus relies on open drain technology. Except for one special case in conjunction with the high speed mode no I2C device is allowed to drive the bus, i.e. to send a 1 by putting voltage on the bus. Instead, the bus is terminated to a high level, e.g. 5 V and both lines, SCL and SDA, remain there during idle mode. A device sends a 0 by pulling the bus to ground level. A 1 is sent by doing nothing, i.e. leaving the bus at high level. The termination of I2C lines is achieved by connecting the bus to the reference voltage of the bus over an appropriate resistor. Missing or wrong termination is the source of many field problems. As a rule of thumb, the higher the termination the better the signals. On the other hand a high termination bares a potential risk of damaging components. By the way, in I2C engineering terms a high termination means a strong pull-up to VCC which translates into a low value for the resistor.
 
+IR protocol
+============
+
+Here is an example output
+```
+LEN =    11
+START_H: 69
+START_L: 34
+DATA_H:   9
+DATA_L:  25
+DATA_LEN = 6
+DATA: 0x40 0x04 0x05 0x38 0x48 0x75 
+DATA:   64    4    5   56   72  117
+
+LEN =    0000 1011
+START_H: 0100 0101
+START_L: 0010 0010
+DATA_H:  0000 1001 
+DATA_L:  0001 1001
+DATA_LEN = 0000 0110
+DATA: 0x40 0x04 0x05 0x38 0x48 0x75 
+DATA:   64    4    5   56   72  117 
+```
+
+I don't know what the START_H START_L DATA_H DATA_L is, but DATA_LEN and DATA makes sense
+I will guess:
+If len is 6 => 2 tag device, and 4 tag code
+If len is 4 => 2 tag device, and 2 tag code
+Some IRs send the same code twice.
+So you could probably ignore that.
+
+
 README.md 
 ============
 
