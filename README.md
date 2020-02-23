@@ -154,6 +154,13 @@ If len is 4 => 2 tag device, and 2 tag code
 Some IRs send the same code twice.
 So you could probably ignore that.
 
+Some more info:
+
+start signal high time
+start signal low time
+bit high time
+bit low time
+
 
 README.md 
 ============

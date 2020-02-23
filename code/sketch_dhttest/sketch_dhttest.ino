@@ -105,20 +105,21 @@ class myinDTemp {
     }
 };
 
-class myinIR {
+class myinoutIR {
     const byte _pin;
 
   public:
-    myinIR(byte attachTo) :
+    myinoutIR(byte attachTo) :
       _pin(attachTo)
     {
     }
 
-    ~myinIR()
+    ~myinoutIR()
     {
     }
 
     void setup() {
+      Serial.print("IR read ");Serial.println(_pin);
       IR.Init(_pin);
     } 
     void loop(unsigned long milliseconds) {
@@ -132,6 +133,7 @@ class myinIR {
         unsigned long ir_device = 0;
         unsigned long ir_button = 0;
         unsigned long ir_group = 0;
+        
         if (IR.IsDta()) {               // get IR data
             // TODO some devices send the same code twice
             IR.Recv(dta);               // receive data to dta
@@ -149,6 +151,28 @@ class myinIR {
         } 
       }
       Serial.println("Finished Checking for IR messages");
+    }
+
+    void send() {
+      unsigned char dtaSend[20];
+      dtaSend[BIT_LEN]        = 11;     // all data that needs to be sent
+      dtaSend[BIT_START_H]    = 179;    // the logic high duration of "Start"
+      dtaSend[BIT_START_L]    = 90;     // the logic low duration of "Start"
+      dtaSend[BIT_DATA_H]     = 11;     // the logic "long" duration in the communication
+      dtaSend[BIT_DATA_L]     = 33;     // the logic "short" duration in the communication
+
+      dtaSend[BIT_DATA_LEN]   = 6;      // Number of data which will sent. 
+      //If the number is other, you should increase or reduce dtaSend[BIT_DATA+x].
+
+      //0x40 0x04 0x05 0x38 0x48 0x75
+      dtaSend[BIT_DATA + 0]   = 0x40;      // data that will sent
+      dtaSend[BIT_DATA + 1]   = 0x04;
+      dtaSend[BIT_DATA + 2]   = 0x05;
+      dtaSend[BIT_DATA + 3]   = 0x38;
+      dtaSend[BIT_DATA + 4]   = 0x48;
+      dtaSend[BIT_DATA + 5]   = 0x75;
+      IR.Send(dtaSend, 38);
+      Serial.println("IR Sent the data");
     }
 };
 
@@ -374,9 +398,9 @@ class myinWatertemp {
 * My vars
 *---------------------------------------*/
 myinDTemp dtemp(2);
-//myoutPaper paper;
+myoutPaper paper;
 myinWatertemp watertemp(4);
-myinIR ir(3);
+myinoutIR irin(6);
 
 /*---------------------------------------
 * Code
@@ -384,15 +408,15 @@ myinIR ir(3);
 void setup() {
   Serial.begin(9600);
   dtemp.setup();
-  //paper.setup(false); // does everything, false => skip
+  paper.setup(false); // does everything, false => skip
   watertemp.setup();
-  ir.setup();
+  irin.setup();
 }
 
 void loop() {
   dtemp.loop();
-  //paper.loop(); // nothing
+  paper.loop(); // nothing
   watertemp.loop();
-  ir.loop(50000);
+  irin.loop(50000);
   delay(5000); //Delay 2 sec. 
 }

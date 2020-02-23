@@ -190,6 +190,7 @@ Pins : Looking at it:  Left=TX NC +5v Gnd
 Code
 There are a few libs, this maybe the one to go for as it supports the IR send too.  
 However it's not as easy to use.
+I have edited the prints, and it maybe okay now
 git clone https://github.com/Seeed-Studio/IRSendRev.git
 
 // setup
@@ -237,3 +238,9 @@ unsigned char dta[20];
     }
 
 ```
+
+For emitting data I think it is fixed to pin 3, which suits me as pin 3 is free.
+And all you do is call send?
+There is a global object IR always avail, so you can use it, after you call init on it maybe
+
+I am not sure one ard can do sending and receiving, we shall the see
