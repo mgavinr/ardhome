@@ -163,6 +163,12 @@ bit low time / logic short duration
 
 whatever they are it seems they are needed, strange, anyway you don't need to send the msg twice, phew
 
+COMPONENTS
+=======
+
+# So Transistors
+
+some trans stuff here please
 
 README.md 
 ============
