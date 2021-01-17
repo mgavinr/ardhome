@@ -1,8 +1,13 @@
 # components
 
-1. Inductor(#Inductor)
-2. Transister(#Transister)
-2. Diodes(#Diodes)
+Capacitor
+============
+A coupling capacitor 
+  AC ----| |----------
+If it's chosen correctly, it can block any DC offset values in AC. Choose one that allows the AC feq you want thru, e.g. 1uF is a high pass filter, that will let most freq in audio range thru.
+
+Also at the output you'd want to remove this so 8V down to 0V but keep the amplifications.
+
 
 Inductor
 ============
@@ -13,12 +18,85 @@ Flyback V, in motors and inducts?, is the V spike induced when the current chang
 -13V for a 5v fan
 Diode in parallel:
 
+```
        +---------|<------+         
 + -----+--xxxxx--\/\/\---+---------
+```
 
 Transister
 ============
+* V = Iams * Rohm
+* V * 1000 = Imiliamps * Rohm
+* Iams = V/Rohm 
+* Imiliamps = V*1000 / Rohm
 
+Background
+------------
+* On off switch, or amplify signal in the active region.
+
+Characteristics 2N3904 TO-92 TO-220big
+------------
+* Voltage across them is: 
+* Vce=0.2v drop, Vbe=0.7v drop, Vcb is a voltage gain 0.5v or Vcb = -0.5v ie base>collector whatever that means
+* A 1KO resister is good for Arduino and Bases => 4.3mA = Ib
+* Ic = Beta * Ib it is typically 100 => 430mA omg really? fuck me maybe they mean something else, 100 up to the max Ic is it, sweet jesus hFE
+* Iabovec = Ibelowe - Iintobase
+* Max Ic = 200mA .. 
+* Power dicipated is Ic * Vce = 0.2 * 0.2 = 0.04 watts   Pd=Ima*Vce = 200*0.2 40mWatts
+* Power dicipated when not saturated the Vce is 5v somehow and that means 1Watt which is bad
+* VCEO = is the max V c-e in the off mode that the trans can be off for 40V
+* VCBO = is the max V c-b 60V
+* VEBO = is the max V e-b 6V (reverse i mean)
+
+BJT: NPN 
+------------
+* The load is usually high side
+* Just need to raise the base voltage to 0.7v (base-e) and provide some small current to turn on
+* The Ic:
+* Say 6V, the trans is 0.2v so the motor drop is 5.8v, so the motor current is 5.8v/100ohm = 58mA for a 100 ohm motor, which is less than the max 200mA example for some trans
+
+```
+               VCC
+                |
+             [MOTOR] flyback allow up, block down
+                |
+                |
+              |/  Collector
+ VBB --[1k]---|             
+              |\            
+                > Emitter
+                |
+                |
+                _
+
+```
+
+BJT: PNP 
+------------
+* The load is usually low side
+* To turn off VBB 5v, to turn on VBB is slightly less to 0V
+* To turn off, the Vbe needs to be lower than 0.7v so ard is 5v, VCC is 6V the emitter turns on for > 0.7v not possible to turn off doh. But if VCC was also 5v you are okay, you can turn it off you can have less than 0.7v omg.
+
+```
+               VCC
+                |
+                |
+                |
+              |</ Emitter
+ VBB --[1k]---|             
+              |\            
+                | Collector
+                |
+             [MOTOR] flyback allow up, block down
+                |
+                _
+
+```
+
+
+
+Notes
+------------
 Switch or Amplify small signals.
 On or off, or active region, small changes in active region in the input, means lots of changes in the output
 These are active, so > power than input?
