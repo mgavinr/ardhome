@@ -169,6 +169,74 @@ bit low time / logic short duration
 
 whatever they are it seems they are needed, strange, anyway you don't need to send the msg twice, phew
 
+BATTERIES
+============
+
+* If your circuit draws 35mA, a battery with a 3400mAh rating can be expected to last about 4 days.
+explain?  maybe later you should know what i mean
+* If you connect 4 1.5v AAs 2000mA batteries along the + line, that is believe it or not a 1.5v battery still.  But it can send something made up on a website
+* AA battery 1.5v and up to 50mA.  But they write it 1500mAh - mili amp hour?  Which means?  I can be exact, it means it can supply 1500mA in one hour.  That is great.
+A typical arduino uses 80mA - that means no go.  Ok a typical Arduino uses 25mA lets say.  So those batteries can power it.  That means a 1.5v stepped up can power it for 60 hours by my reconning.  And 60 hours is what exactly?  2.5 days. 
+* You can connect two power packs in parallel to create more current (double so called), but with the same voltage.
+
+Here is another example, this time from the web:
+* A 12V 2400mAh - circuit 12V 300mA => 2400/300 = 8 hours
+
+Someone suggests wiring a series diode to the 5v battery in ..
+
+Someone suggests using the barrel and it's regulator is wasting battery and heat and stuff.. and resources to climb above the 6V.
+
+Someone suggests 6 AAs into the barrel is the way to go as that's what it's for.  Other above is to fry stuff if you ..
+
+Someone suggests using less batteries 3 and a DC booster.  You loose the least then.  I believe that is direct in no regs.
+
+Someone suggests 3 AAs direct to vin, that way no power wasted on reg, and you get 6 months..
+
+If you use 12V on the reg, you are throwing away half the power as heat.
+
+Some interesto stuff there.  But me being me wants to have a battery backup supply.
+
+Ah very interesting, most USB power banks require a minimum load or they shut off, therefore, you need to periodically pulse a high power LED.  soooo maybe it's best to go battery only? instead of the power bank.  Here is an example: This particular arrangement works for my XiaoMi PowerBank (20A).  Total power drawn is roughly 3.5mAh (per hour), so its not too bad.  Assuming it runs at 5v (from the USB)... 0.0035Ah x 5v = 0.0175Wh If you run it for 24 hours.. 0.0175Wh x 24 = 0.42Wh Assuming the powerbank only holds 15A (x3.7v = 55Wh) ...  this circuit will finish the battery in about 4 months.
+
+
+# Arduino inputs
+
+The ard has 4 ways to power it.  
+* USB is 5V in or else.  There is a current limit of 250mA or 500mA depending on moon phase.
+* The barrel jack is +7 to 12v in, and the positive is the central part of the jack  Maybe min 6V would be enough.
+* Vin as above, but can be used in conjunction to the above if you need to split, but in general don't use both
+* The 5V pin, it is for output normally, but you can input it if you know it is 5V and nothing but
+
+Interestingly the ard has a comparison circuit.  So if the USB and barrel is powered, the power comes from the barrel first, and then switches over to the usb.  Why? Why not.  I would like the reverse.
+
+There is a P MOSFET so I just need a P MOSFET and switch around the inputs right?  Anyway the P MOSFET has:
+```
+               5V USB
+                 |
+                 |
+   barrel ----[FDN340P]
+                 |
+                 +--- 5V in to ard
+```
+In the above case the barrel is also connected to an opamp? comaritor that compares the input to 3V3 for something else.
+
+I guess you could keep the barrel and then instead of USB powered the USB 5v could be applied directly to the Vin pin - that way you would get your order or precedence, but the Vin line is not protected at all..
+
+There is also the 5V line, but you normally draw there instead of power there.
+
+In fact that don't mention applying there and the barrel just one or the other.
+
+There are some good ways to destroy the ards here.
+
+The ard doesn't require 5v per se, but the Atmel chip needs 1.8V to 5.5V.  Anything below 4V will mean the 3.3V regulator will not work, and also the the Atmel chip will not work reliably at high clock speeds, so some 3.3V ards use 8MHz instead of 16MHz.
+
+# Arduine sleep mode
+
+Use PWM to reduce power draw.  Here are some power saving notes for the chip
+http://www.gammon.com.au/power
+
+
+
 
 README.md 
 ============
