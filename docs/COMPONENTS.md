@@ -3,58 +3,97 @@
 Capacitor
 ============
 A coupling capacitor 
-  AC ----| |----------
-If it's chosen correctly, it can block any DC offset values in AC. Choose one that allows the AC feq you want thru, e.g. 1uF is a high pass filter, that will let most freq in audio range thru.
+```
+AC ----| |----------
+```
+If it's chosen correctly, it can block any DC offset values in AC. Choose one that allows the AC feq you want thru, e.g. 1uF is a high pass filter, that will let most freq in audio range thru.  You would also use a capacitor at the output pin, if you want to remove DC there.
 
-Also at the output you'd want to remove this so 8V down to 0V but keep the amplifications.
+Sometimes connect
+```
++ ----->|----| |----- -
+```
 
+Sometimes connect
+```
++ ----->|----| |----- -
+          |         |
+          ---\/\/\---
+```
+
+The voltage on capacitor is the max of Voltage, so if it starts at 5V but drops to 3V it is still 5V at the capacitor, for awhile anyway.  So e.g. to have a reading over a capacitor you can measure the max voltage over the last 5 seconds for a 100uF cap, but putting in a specific resister:
+```
+X time.discharge.seconds = 5 * RC
+5  = 5RC
+R = 5/(5C)
+R = 5/(5*100uF)           1u = 0.000001 
+R = 5/(5*0.0001uF)
+R = 10000 = 5/0.000500
+R = 10kohm
+```
 
 Inductor
 ============
 
-Motor is like a Inductor and R together
-Resistence to change in current?
-Flyback V, in motors and inducts?, is the V spike induced when the current changes.
--13V for a 5v fan
-Diode in parallel:
-
+* inductor resists change in current.
+* Motor is like a Inductor and R together.  
+* Generally you would have a diode to prevent flyback voltage, which could be -13V for a 5V fan.
 ```
-       +---------|<------+         
+       <- - - - fly - - high <
+       
+        ---------|<------         
+       |                 |         
 + -----+--xxxxx--\/\/\---+---------
+     - - - - normal - - - >
+     high                low
 ```
 
-Transister
+Laws
 ============
-* V = Iams * Rohm
-* V * 1000 = Imiliamps * Rohm
-* Iams = V/Rohm 
-* Imiliamps = V*1000 / Rohm
+* Basic
+```
+V = IR 
+I = V/R
+voltage * 1000 = miliamps * ohm
+miliamps = (voltage * 1000) / ohm
+```
+* Power
+```
+P = IV
+watts = amps * voltage
+miliwatts = miliamps * voltage
 
-Background
-------------
-* On off switch, or amplify signal in the active region.
+For a transistor the voltage is the voltage dropped across the collector-emitter which is usually 0.2v.  An example for 200mA of current, that is 40 miliwatts of power.
+```
 
-Characteristics 2N3904 TO-92 TO-220big
-------------
-* Voltage across them is: 
-* Vce=0.2v drop, Vbe=0.7v drop, Vcb is a voltage gain 0.5v or Vcb = -0.5v ie base>collector whatever that means
-* A 1KO resister is good for Arduino and Bases => 4.3mA = Ib
-* Ic = Beta * Ib it is typically 100 => 430mA omg really? fuck me maybe they mean something else, 100 up to the max Ic is it, sweet jesus hFE
-* Iabovec = Ibelowe - Iintobase
-* Max Ic = 200mA .. 
-* Power dicipated is Ic * Vce = 0.2 * 0.2 = 0.04 watts   Pd=Ima*Vce = 200*0.2 40mWatts
-* Power dicipated when not saturated the Vce is 5v somehow and that means 1Watt which is bad
-* VCEO = is the max V c-e in the off mode that the trans can be off for 40V
-* VCBO = is the max V c-b 60V
-* VEBO = is the max V e-b 6V (reverse i mean)
+Transisters
+============
+* On off switch, or amplify small small small signals in the active region.
+* BJT is used to switch motors, as they gobble up current?
+* MOSFET is used for power circuits, as they grow moss.
+* The metal ones are good for heat dissapation, the thru hole is for a heatsink you glue on
+
+Some characteristics of a BJT transisters (like 2N3904 TO-92 TO-220big)
+```
+some typical max voltages for wrong setup is        40 - 60v
+some typical max current is                         200mA
+voltage dropped from collector to emitter is        0.2v
+voltage dropped from base to emitter is             0.7v
+current flowing into the collector is               Beta * Ib
+                                                    example: 100 * 4.3mA  (A 5V near base + 1k ohm resister means base current 4.3mA)
+current flowing out of base is                      Ic + Ib
+
+a BJT NPN (high side) is normally always off, you just need to raise the Vb to > 0.7v to turn it on.
+
+a BJT PNP (low side) is normally always on, to turn off you need to raise the Vb so that it is the same as the VCC (within 0.7v)
+
+so if your PSU is 5V, you raise the base to 5v, then the diode is off so transistor is off.  But if the VCC is 6V and you raise to 5V the transistor is still on.
+
+so if your PSU is 6V and the trans is 0.2v, then the voltage drop across your circuit is 5.8v, so the 100 ohm motor current is I=V/R=5800/100=58mA and that is less than some example transistor maximums of 200mA
+
+```
 
 BJT: NPN 
 ------------
-* The load is usually high side
-* Just need to raise the base voltage to 0.7v (base-e) and provide some small current to turn on
-* The Ic:
-* Say 6V, the trans is 0.2v so the motor drop is 5.8v, so the motor current is 5.8v/100ohm = 58mA for a 100 ohm motor, which is less than the max 200mA example for some trans
-
 ```
                VCC
                 |
@@ -73,9 +112,6 @@ BJT: NPN
 
 BJT: PNP 
 ------------
-* The load is usually low side
-* To turn off VBB 5v, to turn on VBB is slightly less to 0V
-* To turn off, the Vbe needs to be lower than 0.7v so ard is 5v, VCC is 6V the emitter turns on for > 0.7v not possible to turn off doh. But if VCC was also 5v you are okay, you can turn it off you can have less than 0.7v omg.
 
 ```
                VCC
@@ -93,97 +129,7 @@ BJT: PNP
 
 ```
 
-
-
-Notes
-------------
-Switch or Amplify small signals.
-On or off, or active region, small changes in active region in the input, means lots of changes in the output
-These are active, so > power than input?
-Saturation mode, fully on ..  Vce is 0.2v or Vsat .. Vbe is still 0.7v
-
-The metal ones are good for heat dissapation, the thru hole is for a heat sink you glue on lolo
-
-A switch? Turn on a motor with arduino?  No motor 6v and requires more current.
-
-A 1KO resister is good for Arduino and Bases. => 4.3mA I from arduino (5.0-0.7/1000 = 4.3 mili A)
-
-## Transister - BJT
-
-    N Collector        HIGH     Ic            0.2v
-    P Base                      Ib      Vbe = 0.7v
-    N Emitter +-->+    LOW      Ib+Ic
-
-    P Collector        LOW
-    N Base
-    P Emitter +<--+    HIGH
-
-       or
-
-    P Emitter +<--+    HIGH     Ib+Ic        -0.2v
-    N Base                      Ib     Vbe = -0.7v
-    P Collector        LOW      Ic
-
-Base controls current, top to bottom, based on current at the base
-
-Ib Cutoff mode, no current passes through, Vbe < 0.7v usually 
-Otherwise any current can flow through, so you usually restister it at the base.
-If the current is very small better
-Ic = B * Ib  (B or hFE is the gain) say 100
-
-e.g. 1mA into base, so the other one is 100mA
-what about the other other one, it is 101mA loser
-So 100mA is the Collector current
-
-ntype or ptype
-    N
-    P
-    N
-
-    P
-    N
-    P
-
-Vbe - voltage drop between base and emitter, Vce > 0
-OMG PNP current flows into the emitter out of the base and out of the collector,
-thanks be to dog.
-
-### Transister - High/Low Switch (High/Low Side Switch)
-
-Here is a circuit for 1 is on (NPN) as transister is low:
-
-```
-
-                    6V
-                    +
-                    |
-                [ MOTOR (resister inductor + flyback diode) ]
-                    |
-          1k        +
-  []-----\/\/\-----+|
-                    ->+
-                      |
-                      =
-
-```
-Here is one for 0 is on (PNP) as transister is high side of circuit:
-```
-                    6V
-                      +
-                      |
-                      |
-          1k        <-+
-  []-----\/\/\-----+|
-                    |
-                [ MOTOR (resister inductor + flyback diode) ]
-                    |
-                    =
-
-
-To turn off, the Vbe 
-```
-
-## Transister - FET
+## Transister - MOSFET
 
     Drain
     Gate +---|<--+ 
@@ -194,25 +140,24 @@ Base controls current, top to bottom, based on voltage at Gate
 Diodes
 ============
 
-Control the direction of current through circuit
-You can add a fuse to limit current too
+* Control the direction of current through circuit
+* You can add a fuse to limit current too
+```
 ---->|---
-ptype ntype
-direction left to right
-anode cathode (line, cathode,m is the one with the line, the blocker)
-diode on = forward biased, Vf is the voltage required for it to turn on 0.7v
-off = reverse biased, Vbr is when it breaks the barrier, -100v
-ideal diode => no voltage across it
-You may need to add R to prevent the diodes from overheating in the forward bias
-1N4148 = If = 300mA is the max
+```
+* They are ptype ntype, direction left to right, anode cathode (line, cathode,m is the one with the line, the blocker)
+* A diode on is forward biased, V is the voltage required for it to turn on 0.7v
+* off = reverse biased, Vbr is when it breaks the barrier, -100v
+* An ideal diode has no voltage dropped across it
+* You may need to add R to prevent the diodes from overheating in the forward bias, 1N4148 = I = 300mA is the max
 
-## Diodes - uses rectifier
+## rectifiers (convert ac to dc) weiner is an example
 
-Uses: rectifier convert ac to dc
-dc = direct current, flows in one direction
-A full wave rectifier also converts the negative Vs
-
-A weiner is the 4 diode:
+* Uses: rectifier convert ac to dc
+* For power, you may switch to a rectifier diode (! signal diode) that have higher max current rating
+* dc = direct current, flows in one direction
+* A full wave rectifier also converts the negative Vs
+* A weiner is the 4 diode:
 ```
                    +----------+
                    |          |
@@ -224,28 +169,14 @@ A weiner is the 4 diode:
                [Circuit]      |
                    |          |
                    +----------+
-```
-
 Then to smooth the above add a low pass filter before the circuit
-
-For power, you may switch to a rectifier diode (! signal diode) that have higher max current rating
-
-## Diodes - uses max
-
-Connect
-```
-+ ----->|----| |----- -
 ```
 
-The voltage on capacitor is the max of +, so if + starts at 5v goes to 3v the 
-voltage across the cap is around 5v.  The cap is 100uF
+## max
 
-You can have the max over last 5 seconds:
-    Time-discharge = 5 * R * C
-    5 seconds = 5 * R * C
-    5/5C = R
-    5/5*100uF = R
-    5/0.000500 = R = 10000 = 10kO
+I have no idea.
+
+
 
 ## Diodes - clipper - earmuphs
 
