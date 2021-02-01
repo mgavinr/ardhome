@@ -5,6 +5,11 @@ Insulators
 * Some insulators allow heat thru, and don't conduct, for attaching heat sinks
 * The Drain is sometimes the heat sink attachment
 
+Crystal Resonator
+============
+* A crystal is --|[]|-- and a resonator is that with some caps, and a oscillator is ..
+* Creates signals with constant freq
+
 Capacitor
 ============
 A coupling capacitor 
@@ -35,6 +40,13 @@ R = 5/(5*0.0001uF)
 R = 10000 = 5/0.000500
 R = 10kohm
 ```
+
+Caps with bucks and boosts, there is this info:
+* The input capacitance is meant to further "smooth" the input voltage to the regulators, but the output capacitance is meant to prevent ringing and other issues within each regulator itself when it is under load
+
+Here is a cap to provide a proper reset switch for micro from an electronic signal DTR from USB. 
+https://electronics.stackexchange.com/questions/61537/what-is-the-cap-for-in-arduino-reset-circuit
+so ignore the switch in the above and just DTR and cap...
 
 Inductor
 ============
@@ -192,7 +204,7 @@ Diodes
 * Control the direction of current through circuit
 * schottky drop very little voltage, like 0.2v otherwise the same.  Their symbol is right angle S
 * a zener diode is designed to be wired the wrong way, and has a reference voltage of x when it reaches a certain breakdown voltage.  Their symbol is a slanted Z.  You can't abuse them by over doing the voltage, check the power across them based on their reference voltage drop.  They are written 5v1 or 3v3.
-* You can add a fuse to limit current too
+* You can add a fuse to limit current too, fuses are sometimes called PTC (positive temperature coefficient) fuse (MF-MSMF050-2) - i think it means resetable
 ```
 ---->|---
 ```
