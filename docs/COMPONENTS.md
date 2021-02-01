@@ -141,6 +141,8 @@ Diodes
 ============
 
 * Control the direction of current through circuit
+* schottky drop very little voltage, like 0.2v otherwise the same.  Their symbol is right angle S
+* a zener diode is designed to be wired the wrong way, and has a reference voltage of x when it reaches a certain breakdown voltage.  Their symbol is a slanted Z.  You can't abuse them by over doing the voltage, check the power across them based on their reference voltage drop.  They are written 5v1 or 3v3.
 * You can add a fuse to limit current too
 ```
 ---->|---
@@ -172,62 +174,9 @@ Diodes
 Then to smooth the above add a low pass filter before the circuit
 ```
 
-## max
+## max, and clippers 
 
-I have no idea.
-
-
-
-## Diodes - clipper - earmuphs
-
-Remove negative voltage:
-```
-+ ------------------- ?
-       1kO
-+ ----\/\/\---+------ ?
-              |
-- -------->|--+
-```
-but remember the diode, so it is -0.6v min
-
-You can add a reverse one and remove neegatives too, so now 
-you have -0.6 .. 0.6v.
-
-You can add a psu, and you now have a range -3v .. 2v:
-```
-       1kO
-+ ----\/\/\---+------ 2v
-              |
-       1.4v   |
--      +      |
-- -----+-->|--+
-```
-
-But that seems like theory, unless he plans using some caps or someth, or just have a parralel circuit via the Vin?
-
-## Diodes - shotkey sorry schottky
-
-So normal diodes drop 0.6v these dont drop much. 0.3v
---->S--
-
-## Diodes - zener
-
-A zenar diode has a reference (say 3.3v value) Zener voltage when it's in breakdown mode, 
-also it is placed in reverse. So their cathode faces the +PSU:
-
-+ ----\/\/\----+
-               |
-               |
-              _z_
-              /_\  5V1 or 3V3 
-               |
-- -------------+
-
-You need the resister there.  You should calculate the Power thru it based in the + - drop.
-Don't bash these devices.. or you will burn, burn burn burn forever
-
-There is something like this called a Transient Voltage some or other somewhat that drains,
-usually to ground, any spikes.  The PI has one a chip near the psu..e.g.
+I have no idea on this afraid.
 
 # PSU Failover Project 
 
