@@ -1,5 +1,47 @@
 # Partlist Instructions
 
+## Power
+
+### 78XX Linear regulator
+
+* These have an input, output and reference usually tied to ground.  
+* The in and out are also right angled capacitors that are anything but this guy picks 2.2uF input and 100uF for output.
+
+### LM317 Linear regulator
+
+* These have an input, output and adjust.  
+* It is is variable regulator, out set from 1.25 to 37v to a max 1.5A.
+* Again you can have caps on the outside at right angles to ground.
+* You can think of the adjust hear going to a voltage divider at the output side to ground in the middle.
+* The caps filter the input/output for ..
+
+Vout = 1.25 * (1 + RL/RH)
+Vout = 1.25 * (1 + 820/220)
+Vout = 4.8
+
+### PSM-165 Module
+
+* 3.3 v regulator from 4.5 to 12v.  Up to 800mA.  It is the one on the Arduino.  There is another one that is good for batts, loosing only about 1v.
+
+### L4931CZ33 
+
+* 3.3V or 5v with low v drop like 0.4v regulator.  Looks like a trans, rather than a chip.  Add caps again.
+
+### Bucks 
+
+* are different to linear, and good for batteries, as they are more efficient.
+* all above are high to ref (low)
+
+### Boost converter
+
+* these are low to high
+* PSM-205 is a low v to usb 5v.
+* good to power motors from batteries
+
+### Buck Boost
+
+* Batteries start high reg down, go low reg up, can get hot.
+
 ## Chips
 
 ### Ard timer chip
