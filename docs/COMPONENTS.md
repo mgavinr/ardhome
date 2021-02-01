@@ -49,6 +49,10 @@ Inductor
 
 Laws
 ============
+* 1uF = 0.000001F
+* 1mA = 0.001A
+* High input impedance means it draws little current
+
 * Basic
 ```
 V = IR 
@@ -59,10 +63,16 @@ miliamps = (voltage * 1000) / ohm
 * Power
 ```
 P = IV
+P = IIR
 watts = amps * voltage
 miliwatts = miliamps * voltage
 
 For a transistor the voltage is the voltage dropped across the collector-emitter which is usually 0.2v.  An example for 200mA of current, that is 40 miliwatts of power.
+
+For a mosfet the R is RDSon and the current is whatever your circuit load will draw.  For example a moter 1A, that is 35miliohm is 35miliwatts.
+
+P dissaption = (max temp - ambient) / (per watt coeff) 
+P dissaption = 175 - 25 / 62.5 = 2.4 watts
 ```
 
 Transisters
@@ -71,6 +81,10 @@ Transisters
 * BJT is used to switch motors, as they gobble up current?
 * MOSFET is used for power circuits, as they grow moss.
 * The metal ones are good for heat dissapation, the thru hole is for a heatsink you glue on
+* Notes
+- Depletion mode acts like a closed switch top to bottom if no voltage diff between gate and source.  But if you reverse the voltage like wire it wrong, it is open switch.  This seems kinda like a diode to me.  Depletion is drawn with no dashes.
+- Enhancement mode acts like a variable resister.  The symbol is an E with arrow in middle dash.  The base is a L kicked over.  Base=Gate Emiiter=Source Collector=Drain. D ---> S
+- When voltage is applied between gate and source, high side DS current is on.  When a low voltage is applied, the DS resistence is high.  When some voltage the resistenace is low very low, it is RDSon and 27 mili ohm.  A logical level mosfet has a VGS|VTH value of < 5v, that is, you can turn it on (resistence near zero) with less than 5v drop at V gate-source.  When you apply a greater than VGS value here, no current really flows through from that side of the transister, it's just voltage.
 
 Some characteristics of a BJT transisters (like 2N3904 TO-92 TO-220big)
 ```
@@ -129,13 +143,43 @@ BJT: PNP
 
 ```
 
-## Transister - MOSFET
+## MOSFET NCHANNEL
 
-    Drain
-    Gate +---|<--+ 
-    Source
+```
+               VCC
+                |
+             [MOTOR] flyback allow up, block down
+                |
+                | Drain
+              |-+
+    Gate  +---|<+
+          |   |-+
+          |     | Source
+          |     |
+          |     |
+          _     _
 
-Base controls current, top to bottom, based on voltage at Gate
+```
+
+## MOSFET PCHANNEL
+
+```
+               VCC
+                |
+                |
+                |
+              |-+ Source
+      Gate ---|->           
+              |-+           
+                | Drain
+                |
+             [MOTOR] flyback allow up, block down
+                |
+                _
+
+Not sure about this one, but if you have 0 voltage here at gate it is on.
+```
+
 
 Diodes
 ============
