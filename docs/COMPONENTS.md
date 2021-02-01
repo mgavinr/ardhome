@@ -1,5 +1,10 @@
 # components
 
+Insulators
+============
+* Some insulators allow heat thru, and don't conduct, for attaching heat sinks
+* The Drain is sometimes the heat sink attachment
+
 Capacitor
 ============
 A coupling capacitor 
@@ -152,10 +157,10 @@ BJT: PNP
                 |
                 | Drain
               |-+
-    Gate  +---|<+
+    Gate -+---|<+
           |   |-+
           |     | Source
-          |     |
+          R     |
           |     |
           _     _
 
@@ -169,13 +174,13 @@ BJT: PNP
                 |
                 |
               |-+ Source
-      Gate ---|->           
-              |-+           
-                | Drain
-                |
-             [MOTOR] flyback allow up, block down
-                |
-                _
+    Gate -+---|->           
+          |   |-+           
+          |     | Drain
+          R     |
+          |  [MOTOR] flyback allow up, block down
+          |     |
+          _     _
 
 Not sure about this one, but if you have 0 voltage here at gate it is on.
 ```
