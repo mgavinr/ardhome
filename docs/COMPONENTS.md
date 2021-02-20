@@ -98,6 +98,7 @@ Transisters
 * BJT is used to switch motors, as they gobble up current?
 * MOSFET is used for power circuits, as they grow moss.
 * The metal ones are good for heat dissapation, the thru hole is for a heatsink you glue on
+* Pyysics https://www.youtube.com/watch?v=AoXhq5nAGVs
 * Notes
 - Depletion mode acts like a closed switch top to bottom if no voltage diff between gate and source.  But if you reverse the voltage like wire it wrong, it is open switch.  This seems kinda like a diode to me.  Depletion is drawn with no dashes.
 - Enhancement mode acts like a variable resister.  The symbol is an E with arrow in middle dash.  The base is a L kicked over.  Base=Gate Emiiter=Source Collector=Drain. D ---> S
@@ -125,78 +126,104 @@ so if your PSU is 6V and the trans is 0.2v, then the voltage drop across your ci
 
 BJT: NPN 
 ------------
+(0.7V is the min value to turn on, gnd off)
+A small current flowing into the base, controls a 100 times larger current flowing from Collector to Emitter.
+Voltage base emitter < 0.7v means it's off.
 ```
-               VCC
-                |
+                +-------------- VCC
+                |                _
              [MOTOR] flyback allow up, block down
-                |
-                |
-              |/  Collector
- VBB --[1k]---|             
-              |\            
-                > Emitter
-                |
-                |
-                _
+                |                _
+                |                _
+ V+           |/  Collector      _
+  +----[1k]---|                  _
+  _           |\                 _
+  _             > Emitter        _
+  _             |                _
+  _             |                _
+  ================================
+  ================================
 
 ```
 
 BJT: PNP 
 ------------
-
+(VCC-0.7V to VCC is the min value to turn off, gnd on)
+Base tied to ground controls the lager current through emitter collector. Remember to turn it off, you would need the voltage at the base to be near well enough to VCC.  Some people say the current through the VCC to to base should be 1/10 the main other current, but I thought it was 1/100th .. but they both came up with 1K lol
+Normal operation on is GND, but you raise it to near enough VCC and it's off.  
+I think you low side the stuff, so the voltages are bla, it kinda seems voltage controlled to me this one.
 ```
-               VCC
-                |
-                |
-                |
-              |</ Emitter
- VBB --[1k]---|             
-              |\            
-                | Collector
-                |
+                       VCC
+  +--=          +---------------+
+  |             |               _
+  |             |               _
+  or          |</ Emitter       _
+ GND --[1k]---|                 _
+              |\                _
+                | Collector     _
+                |               _
              [MOTOR] flyback allow up, block down
-                |
-                _
+                |               _
+  ================================
+  ================================
 
 ```
 
 ## MOSFET NCHANNEL
+(VGS or VTH is the min value to turn on, gnd off).
+The voltage at the left terminal (directly at the gate! from gate to ground) it controls the current at the drain source.
+No current flows in the left loop, when it is on.  It is on when there is a voltage.
 
 ```
-               VCC
-                |
+                +-------------- VCC
+                |                _
              [MOTOR] flyback allow up, block down
-                |
-                | Drain
-              |-+
-    Gate -+---|<+
-          |   |-+
-          |     | Source
-          R     |
-          |     |
-          _     _
-
+ ThisV .....    |                _
+           .    |                _
+ V+      G . ||-+ Drain  |       _
+  +--[R]-----+|<+        _       _
+  _      a    |-+        ^       _
+  _      t      | Source |       _
+  _      e      |                _
+  _             |                _
+  ================================
+  ================================
 ```
+
+* The difference between the gate and source is 0, it's off (Vgate = Vsource = GND usually)
+* The difference between the gate and source is +VTH, it's on (Vgate > Vsource)
+* The difference between the gate and source is -VTH, it's off (Vsource > Vgate)
+
+For depletion mode
+* The difference between the gate and source is 0, it's on (Vgate = Vsource = GND usually), only when Vsource > Vgate is it off.  Is this useful for anything..
 
 ## MOSFET PCHANNEL
+(VGS or VTH getting closer to VCC is the min value to turn off, gnd on).
+The Vgs for on is -2 to -4v, so you turn on by setting gate to 0v .. turn off by setting the gate voltage to near enough VCC.  You could use a P channel when the voltage required is still 5v, but the current required is more than an IO pin can supply, but maybe the 5v line out can supply that current?  If your voltage you are turning on is 12v or so n channel is the choice.
 
 ```
-               VCC
-                |
-                |
-                |
-              |-+ Source
-    Gate -+---|->           
-          |   |-+           
-          |     | Drain
-          R     |
-          |  [MOTOR] flyback allow up, block down
-          |     |
-          _     _
+  +--=          +-------------- VCC
+  |             |                _
+  |             |                _
+  |             |        |       _
+         G    |-+ Source _       _
+ GND--[R]-----|->        ^       _
+         a    |-+        |       _
+         t      | Drain          _
+         e      |                _
+             [MOTOR] flyback allow up, block down
+                |                _
+  ================================
+  ================================
 
-Not sure about this one, but if you have 0 voltage here at gate it is on.
 ```
 
+* The difference between the gate and source is 0, it's off (Vgate = Vsource it's off)
+* The difference between the gate and source is +VTH, it's off (Vgate > Vsource it's off)
+* The difference between the gate and source is -VTH, it's on (Vgate < Vsource) 
+
+For depletion mode
+* The difference between the gate and source is 0, it's on (Vgate = Vsource) only when Vgate > Vsource is it off.
 
 Diodes
 ============

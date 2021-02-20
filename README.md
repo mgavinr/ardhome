@@ -115,6 +115,8 @@ It's the chip.  28 pins.  8bit RISC.  16MHz crystal, 2 22pF caps, 10uF cap, and 
 
 The other chip ATmega16U2 converts USB to UART that the ATmega328 understands.  The 16U2 is programmed to do this in this case.
 
+The micro is based on slightly different ATmega32U4.  20 pins, 16MHz, micro usb, ICSP header, reset button.  The 32U4 has built in usb, unlike the one above, so no need for USB controller. 5v.  Input 7-9v.  20mA per IO, or 50mA at 3.3v pin.  I think the ICSP header is for programming the board, and also
+
 # Pins
 
 Digital Pins 0 1
