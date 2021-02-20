@@ -3,7 +3,7 @@
 Insulators
 ============
 * Some insulators allow heat thru, and don't conduct, for attaching heat sinks
-* The Drain is sometimes the heat sink attachment
+* The Drain is sometimes the heat sink attachment.
 
 Crystal Resonator
 ============
