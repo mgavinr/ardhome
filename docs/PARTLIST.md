@@ -2,6 +2,23 @@
 
 ## Power
 
+### RTC Clock DS3231 with a few extra features
+Code: 
+* https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/arduino-usage
+* https://github.com/adafruit/RTClib.git 
+* https://github.com/adafruit/TinyWireM
+
+Pins: 
+```
+There is 5v Gnd, SCL SDA for I2C.
+There is also some extra ones that i have not used but should really.
+```
+
+Example
+```
+Example is ds3231 
+```
+
 ### 78XX Linear regulator
 
 * These have an input, output and reference usually tied to ground.  
