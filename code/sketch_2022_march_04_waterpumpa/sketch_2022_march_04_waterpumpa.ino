@@ -47,7 +47,7 @@ int       g_interval = e_loop_delay_max_interval;
 // DOES: calls event functions if pin changes
 // USES: g_draw_dots
 // RETV: DateTime.hour .minute 
-// TODO change this to an array of events
+// TODO change this to an array of events like https://github.com/janelia-arduino/Vector/blob/master/src/Vector.h
 void levent(short dpin) {
   if(dpin == dpin_mode_button) {
     DEBUG("Mode button pressed");
