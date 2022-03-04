@@ -153,7 +153,7 @@ void setup() {
   myseven.setup();
   myseven.off();
   DEBUG("--- END SETUP ---");
-  MYDEBUG::enabled = false;
+  MYDEBUG::enabled = true;
 }
 
 void loop() {
