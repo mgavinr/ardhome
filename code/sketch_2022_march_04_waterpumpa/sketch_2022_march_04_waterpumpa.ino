@@ -24,8 +24,8 @@ Global variables use 1060 bytes (51%) of dynamic memory, leaving 988 bytes for l
 enum emode {
   e_off = 0,
   e_time,
-  e_on_time,
-  e_off_time,
+  e_start_time,
+  e_end_time,
   e_on_day,
   e_end
 };
@@ -125,11 +125,11 @@ void next_mode() {
     case e_time: 
       DEBUG("The display mode is now: CURRENT TIME");
       break;
-    case e_on_time: 
-      DEBUG("The display mode is now: ON TIME");
+    case e_start_time: 
+      DEBUG("The display mode is now: START TIME");
       break;
-    case e_off_time: 
-      DEBUG("The display mode is now: OFF TIME");
+    case e_end_time: 
+      DEBUG("The display mode is now: END TIME");
       break;
     case e_on_day: 
       DEBUG("The display mode is now: ON DAY");
