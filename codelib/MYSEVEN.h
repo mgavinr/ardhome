@@ -29,6 +29,11 @@ class MYSEVEN {
       Serial.print("Display "); Serial.print(selectors[_select], HEX); Serial.println(" created");
     }
 
+    void off() {
+      _matrix.clear();
+      _matrix.writeDisplay();
+    }
+
     void loop() {
 
     }
