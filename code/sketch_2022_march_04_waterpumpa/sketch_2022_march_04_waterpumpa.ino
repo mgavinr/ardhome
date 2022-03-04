@@ -166,5 +166,4 @@ void loop() {
     DEBUG("The time is currently=%d:%d", now.hour(), now.minute());
   } 
   ldelay(0,dpin_mode_button);
-  delay(1000);
 }
