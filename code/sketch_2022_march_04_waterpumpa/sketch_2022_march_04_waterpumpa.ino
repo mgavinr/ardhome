@@ -60,7 +60,7 @@ void levent(short dpin) {
 }
 
 // WAIT: 0 
-// DOES: get current time from rtc and display it
+// DOES: waits, unless the pin changes
 // USES: g_draw_dots
 // RETV: DateTime.hour .minute 
 void ldelay(int dvalue, short dpin_watch) {
