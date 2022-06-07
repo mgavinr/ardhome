@@ -26,6 +26,9 @@ Global variables use 1062 bytes (51%) of dynamic memory, leaving 988 bytes for l
  fixing the event loop 5000 if off, 1000 if on
 Sketch uses 11256 bytes (34%) of program storage space. Maximum is 32256 bytes.
 Global variables use 1132 bytes (55%) of dynamic memory, leaving 916 bytes for local variables. Maximum is 2048 bytes.
+ adding rtc time setting and sprintf time string ..
+ Sketch uses 13146 bytes (40%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1260 bytes (61%) of dynamic memory, leaving 788 bytes for local variables. Maximum is 2048 bytes.
 */
 // TYPES
 enum emode {
