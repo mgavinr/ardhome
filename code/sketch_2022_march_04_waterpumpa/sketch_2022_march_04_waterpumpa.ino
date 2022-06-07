@@ -55,7 +55,7 @@ MYSEVEN myseven;
 bool      g_draw_dots = false;
 int       g_mode = e_off;
 int       g_loop_delay_ms = e_loop_delay_on_interval;
-int       g_potval = 0;
+int       g_potval = 0;  // 0 to 1000
 
 // WAIT: 0 
 // DOES: calls event functions if pin changes
@@ -166,7 +166,34 @@ void next_mode() {
 void check_mode_value() {
   int last_potval = g_potval;
   g_potval = analogRead(apin_pot);
-  DEBUG("************ The potval is now %d", g_potval);    
+
+  int time24 = g_potval * 2;
+  int time24_hour = time24 / 100;
+  int time24_minute = time24 - (time24_hour * 100);
+  int time24_seconds = 0;
+  if(time24_hour > 23) time24_hour = 23;
+  if(time24_minute > 59) time24_minute = 59;
+  char time24_string[] = "00:00:00";
+  sprintf(time24_string, "%02d:%02d:00", time24_hour, time24_minute);
+  DEBUG("[ADJUST] potval=%d", g_potval);
+  DEBUG("[ADJUST] time24=%d", time24);
+  DEBUG("[ADJUST] time24_hour=%d", time24_hour);
+  DEBUG("[ADJUST] time24_minute=%d", time24_minute);
+  DEBUG("[ADJUST] time24_string=%s", time24_string);
+  DEBUG("[ADJUST] date=%s", __DATE__);
+
+  switch ((emode) g_mode)
+  {
+    case e_time: 
+    case e_start_time: 
+    case e_end_time: 
+      myrtc._rtc.adjust(DateTime(__DATE__, time24_string));
+      break;
+    case e_on_day: 
+      break;
+    default: 
+      break;
+  }
 }
 
 void setup() {
