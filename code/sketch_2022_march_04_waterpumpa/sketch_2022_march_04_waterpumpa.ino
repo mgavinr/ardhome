@@ -1,7 +1,10 @@
 #define MYMAIN 0
 #define MYSERIAL 0
-// this seems to be minimum value for switch 
-#define SLEEP 1000
+#define LOOP_SLEEP_OFF 10000    // just has to be bigger than:
+#define LOOP_SLEEP 1500    // blink clock every second
+#define LOOP_BUTTON_LONG 15
+#define LOOP_BUTTON_MIN 5
+#define LOOP_BUTTON_SHORT 5
 #include "/tmp/a/MYRTC.h"
 #include "/tmp/a/MYSEVEN.h"
 #include "/tmp/a/MYDEBUG.h"
@@ -33,9 +36,15 @@ Global variables use 1132 bytes (55%) of dynamic memory, leaving 916 bytes for l
 Global variables use 1260 bytes (61%) of dynamic memory, leaving 788 bytes for local variables. Maximum is 2048 bytes.
 
 2023
-fix the button pressing, change the delay functions
+- fix the button pressing, change the delay functions
 Sketch uses 11534 bytes (35%) of program storage space. Maximum is 32256 bytes.
 Global variables use 1180 bytes (57%) of dynamic memory, leaving 868 bytes for local variables. Maximum is 2048 bytes.
+- add back the edit, bit of a jump now!! :(
+Sketch uses 13742 bytes (42%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1348 bytes (65%) of dynamic memory, leaving 700 bytes for local variables. Maximum is 2048 bytes.
+- fix the edit button for time, add some averaging pots
+Sketch uses 14312 bytes (44%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1435 bytes (70%) of dynamic memory, leaving 613 bytes for local variables. Maximum is 2048 bytes.
 
 */
 // TYPES
@@ -62,8 +71,9 @@ MYRTC myrtc;                        // internal objs
 MYSEVEN myseven;                    // internal objs
 //
 DateTime  g_draw_time;              // display the time
+bool      g_edit_mode = false;      // long press => stay in edit mode
 bool      g_draw_dots = false;      // display the :
-int       g_loop_delay_ms = SLEEP;  // loop interval is 1 second
+int       g_loop_delay_ms = LOOP_SLEEP;  // loop interval is 1 second
 int       g_button_high = 0;        // interval button was pressed for
 int       g_mode = e_off;           // startup is off
 int       g_potval = 0;             // 0 to 1000
@@ -127,9 +137,51 @@ void next_mode_code() {
   }
 }
 
-void check_mode_value() {
+/*
+Sketch uses 14200 bytes (44%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1435 bytes (70%) of dynamic memory, leaving 613 bytes for local variables. Maximum is 2048 bytes.
+
+or with averages
+
+Sketch uses 14312 bytes (44%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1435 bytes (70%) of dynamic memory, leaving 613 bytes for local variables. Maximum is 2048 bytes.
+
+Do you like my rudementary maths?  I think there are no bugs here right, right you bet
+
+*/
+int analogMyRead(short port) {
+  int potval1, potval2, potval3, potval4 = 0;
+  int potvalt1, potvalt2, potvalt3, potvalt4 = 0;
+  int potvalt = 0;
+  int potvalr = 0;
+  potval1 = analogRead(apin_pot);
+  ldelay(10);
+  potval2 += analogRead(apin_pot);
+  ldelay(10);
+  potval3 += analogRead(apin_pot);
+  ldelay(10);
+  potval4 += analogRead(apin_pot);
+  ldelay(10);
+  potvalt1 = (potval2 + potval3 + potval4)*2;
+  potvalt2 = (potval1 + potval3 + potval4)*2;
+  potvalt3 = (potval1 + potval2 + potval4)*2;
+  potvalt4 = (potval1 + potval2 + potval3)*2;
+  // Pick the highest one ..
+  potvalt = potvalt1;
+  if (potvalt1 < potvalt2) potvalt = potvalt2;
+  if (potvalt1 < potvalt3) potvalt = potvalt3;
+  if (potvalt1 < potvalt4) potvalt = potvalt4;
+  //
+  if (potvalt2 < potvalt3) potvalt = potvalt3;
+  if (potvalt2 < potvalt4) potvalt = potvalt4;
+  //
+  if (potvalt3 < potvalt4) potvalt = potvalt4;
+  return (potvalt/6);
+}
+
+void edit_mode_code() {
   int last_potval = g_potval;
-  g_potval = analogRead(apin_pot);
+  g_potval = analogMyRead(apin_pot);
 
   int time24 = g_potval * 2;
   int time24_hour = time24 / 100;
@@ -140,19 +192,21 @@ void check_mode_value() {
   char time24_string[] = "00:00:00";
   sprintf(time24_string, "%02d:%02d:00", time24_hour, time24_minute);
   DEBUG("[ADJUST] potval=%d", g_potval);
-  DEBUG("[ADJUST] time24=%d", time24);
-  DEBUG("[ADJUST] time24_hour=%d", time24_hour);
-  DEBUG("[ADJUST] time24_minute=%d", time24_minute);
-  DEBUG("[ADJUST] time24_string=%s", time24_string);
-  DEBUG("[ADJUST] date=%s", __DATE__);
+  DEBUG("[......] time24=%d", time24);
+  DEBUG("[......] time24_hour=%d", time24_hour);
+  DEBUG("[......] time24_minute=%d", time24_minute);
+  DEBUG("[......] time24_string=%s", time24_string);
+  DEBUG("[......] date=%s", __DATE__);
 
   switch ((emode) g_mode)
   {
     case e_time: 
+      myrtc._rtc.adjust(DateTime(__DATE__, time24_string));
+      DEBUG("[ADJUST] rtc=%s", time24_string);
+      g_draw_time = myrtc._rtc.now();
+      break;
     case e_start_time: 
     case e_end_time: 
-      myrtc._rtc.adjust(DateTime(__DATE__, time24_string));
-      break;
     case e_on_day: 
       break;
     default: 
@@ -212,7 +266,7 @@ void loop_sleep(int maxwait, short watch_pin) {
       }
       // noone is pressing, can we return something?
       // 10 is kinda like a debouncer right?
-      if (g_button_high > 10) {
+      if (g_button_high > LOOP_BUTTON_MIN) {
         DEBUG("Switch was on %d times, off now", g_button_high);
         loop_event(watch_pin);
         return;
@@ -237,8 +291,29 @@ void loop_sleep(int maxwait, short watch_pin) {
 */
 void loop_event(short dpin) {
   if(dpin == dpin_mode_button) {
-    DEBUG("Mode button pressed");
-    next_mode_code();
+    if ((g_button_high >= LOOP_BUTTON_SHORT) && (g_button_high < LOOP_BUTTON_LONG)) {
+      // short press
+      DEBUG("!! Mode button pressed");
+      if (g_edit_mode) {
+        DEBUG("Leave edit mode, next mode");
+        edit_mode_code();
+        g_edit_mode = false;
+      } else {
+        next_mode_code();
+      }
+    }
+    if ((g_button_high >= LOOP_BUTTON_LONG) || (g_edit_mode == true)) {
+      if (g_edit_mode == false) { DEBUG("!! Edit Mode button pressed"); }
+      // long press
+      g_edit_mode = true;
+      edit_mode_code();
+      ldelay(100);
+      myseven._matrix.clear();
+      myseven._matrix.writeDisplay();
+      ldelay(100);
+      display_time(); 
+      edit_mode_code();
+    } 
     if(g_mode == e_off) {
       myseven._matrix.clear();
       myseven._matrix.writeDisplay();
@@ -248,17 +323,29 @@ void loop_event(short dpin) {
 }
 
 void loop() {
-  if(g_mode == e_off) {
-    // loop forever really
-    loop_sleep(10000, dpin_mode_button);
+  if(g_edit_mode) {
+      // stay in this mode
+      DEBUG("In edit mode");
+      myrtc.loop();  //empty
+      myseven.loop();  //empty
+      g_draw_dots = !g_draw_dots;
+      display_time(); 
+      loop_event(dpin_mode_button); // <---- here
+      loop_sleep(g_loop_delay_ms, dpin_mode_button);
+      g_loop_delay_ms = LOOP_SLEEP;
   } else {
-    // Display is on
-    // check_mode_value();
-    myrtc.loop();  //empty
-    myseven.loop();  //empty
-    g_draw_dots = !g_draw_dots;
-    display_time(); 
-    loop_sleep(g_loop_delay_ms, dpin_mode_button);
-    g_loop_delay_ms = SLEEP;
+    if(g_mode == e_off) {
+      // loop forever really
+      loop_sleep(LOOP_SLEEP_OFF, dpin_mode_button);
+    } else {
+      // Display is on
+      // check_mode_value();
+      myrtc.loop();  //empty
+      myseven.loop();  //empty
+      g_draw_dots = !g_draw_dots;
+      display_time(); 
+      loop_sleep(g_loop_delay_ms, dpin_mode_button);
+      g_loop_delay_ms = LOOP_SLEEP;
+    }
   }
 }
