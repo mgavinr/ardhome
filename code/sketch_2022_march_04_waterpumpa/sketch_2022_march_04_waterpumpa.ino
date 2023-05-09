@@ -1,5 +1,7 @@
 #define MYMAIN 0
 #define MYSERIAL 0
+// this seems to be minimum value for switch 
+#define SLEEP 1000
 #include "/tmp/a/MYRTC.h"
 #include "/tmp/a/MYSEVEN.h"
 #include "/tmp/a/MYDEBUG.h"
@@ -29,6 +31,12 @@ Global variables use 1132 bytes (55%) of dynamic memory, leaving 916 bytes for l
  adding rtc time setting and sprintf time string ..
  Sketch uses 13146 bytes (40%) of program storage space. Maximum is 32256 bytes.
 Global variables use 1260 bytes (61%) of dynamic memory, leaving 788 bytes for local variables. Maximum is 2048 bytes.
+
+2023
+fix the button pressing, change the delay functions
+Sketch uses 11534 bytes (35%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1180 bytes (57%) of dynamic memory, leaving 868 bytes for local variables. Maximum is 2048 bytes.
+
 */
 // TYPES
 enum emode {
@@ -49,90 +57,41 @@ const short dpin_time_on = 9;
 const short dpin_time_day = 8;
 const short apin_high = 3;
 const short apin_pot = 2;
-const short e_loop_delay_off_interval = 5000;
-const short e_loop_delay_on_interval = 1000;
-const short e_loop_delay_poll_interval = 250;
 // VARS
-MYRTC myrtc;
-MYSEVEN myseven;
-bool      g_draw_dots = false;
-int       g_mode = e_off;
-int       g_loop_delay_ms = e_loop_delay_on_interval;
-int       g_potval = 0;  // 0 to 1000
+MYRTC myrtc;                        // internal objs
+MYSEVEN myseven;                    // internal objs
+//
+DateTime  g_draw_time;              // display the time
+bool      g_draw_dots = false;      // display the :
+int       g_loop_delay_ms = SLEEP;  // loop interval is 1 second
+int       g_button_high = 0;        // interval button was pressed for
+int       g_mode = e_off;           // startup is off
+int       g_potval = 0;             // 0 to 1000
 
-// WAIT: 0 
-// DOES: calls event functions if pin changes
-// USES: g_draw_dots
-// RETV: DateTime.hour .minute 
-// TODO change this to an array of events like https://github.com/janelia-arduino/Vector/blob/master/src/Vector.h
-void levent(short dpin) {
-  if(dpin == dpin_mode_button) {
-    DEBUG("Mode button pressed");
-    next_mode();
-    if(g_mode == e_off) {
-        myseven._matrix.clear();
-        myseven._matrix.writeDisplay();
-    }
-  }
-}
 
-// WAIT: 0 
-// DOES: waits, unless the pin changes
-// USES: g_draw_dots
-// RETV: DateTime.hour .minute 
-void ldelay(int delay_ms, short dpin_watch) {
-  if (delay_ms > 0) {
-    DEBUG("Wait of:%d mili exactly",delay_ms);
-    delay(delay_ms);  // short delay
-    g_loop_delay_ms-=delay_ms;  
-  } else {
-    if (dpin_watch > 0) {
-      // check for events and delay
-      DEBUG("Wait of: %d mili seconds this loop", g_loop_delay_ms);
-      int start_value = digitalRead(dpin_watch);
-      int curr_value = start_value;
-      while(curr_value == start_value) {
-        curr_value = digitalRead(dpin_watch);
-        //DEBUG("Pin value: %d", curr_value);
-        delay(e_loop_delay_poll_interval);  // short delay
-        g_loop_delay_ms-=e_loop_delay_poll_interval;  
-        if(g_loop_delay_ms <= 0) break;
-      }
-      //DEBUG("Pin value: %d", curr_value);
-      if (curr_value != start_value) {        
-        levent(dpin_watch);        
-      }
-    } else {
-      DEBUG("Wait of: %d mili seconds this loop no interrupt",g_loop_delay_ms);
-      delay(g_loop_delay_ms);  // full delay
-    }
-  }
-}
 
 // WAIT: 0 
 // DOES: get current time from rtc and display it
 // USES: g_draw_dots
 // RETV: DateTime.hour .minute 
-DateTime display_time() {
+void display_time() {
   int display_time = 0;
-  DateTime now = myrtc._rtc.now();
-  display_time = now.hour() * 100;
-  display_time += now.minute();
+  display_time = g_draw_time.hour() * 100;
+  display_time += g_draw_time.minute();
   DEBUG("Computed time=%d",display_time);
   myseven._matrix.clear();
   myseven._matrix.print(display_time);
   myseven._matrix.drawColon(g_draw_dots);
   myseven._matrix.writeDisplay();
-  return now;
 }
 
 // WAIT: 500 
 // DOES: sets the mode flashes led 
 // USES: g_mode
 // RETV:
-void next_mode() {
+void next_mode_code() {
   digitalWrite(dpin_intled, HIGH);
-  ldelay(500,0);
+  ldelay(200);
   digitalWrite(dpin_intled, LOW);
   g_mode++;  
   if(g_mode == e_end) g_mode = 0;
@@ -144,6 +103,8 @@ void next_mode() {
   {
     case e_time: 
       DEBUG("The display mode is now: CURRENT TIME");
+      g_draw_time = myrtc._rtc.now();
+      DEBUG("The time is currently=%d:%d", g_draw_time.hour(), g_draw_time.minute());
       break;
     case e_start_time: 
       DEBUG("The display mode is now: START TIME");
@@ -222,19 +183,82 @@ void setup() {
   MYDEBUG::enabled = true;
 }
 
+// WAIT: 0 
+// DOES: waits, unless the pin changes
+// USES: g_draw_dots
+// RETV: DateTime.hour .minute 
+void ldelay(int delay_ms) {
+  DEBUG("ldelay(%d ms)",delay_ms);
+  delay(delay_ms);  // short delay
+  g_loop_delay_ms-=delay_ms;  
+  DEBUG("loop=%dms", g_loop_delay_ms);
+}
+
+/* 
+** loop_sleep - polls the watch pin, it is a busy loop reading the pin every 100ms, it runs endlessly
+** Waiting = forever and 100ms
+** Globals = 
+** Returns =
+*/
+void loop_sleep(int maxwait, short watch_pin) {
+  int curr_value = HIGH;    // off
+  DEBUG("loop_sleep polling for max %d ms", maxwait);
+  while(maxwait > 0) {
+    curr_value = digitalRead(watch_pin);
+    // nothing, noone is pressing
+    if (curr_value == HIGH) {
+      if (g_button_high > 0) {        
+        curr_value -= 1;
+      }
+      // noone is pressing, can we return something?
+      // 10 is kinda like a debouncer right?
+      if (g_button_high > 10) {
+        DEBUG("Switch was on %d times, off now", g_button_high);
+        loop_event(watch_pin);
+        return;
+      }
+    }
+    // someone is pressing, keep adding
+    if (curr_value == LOW) {
+      DEBUG("Switch still on %d times", g_button_high);
+      g_button_high += 1;
+    }
+    delay(100);
+    maxwait -= 100;
+  }
+  DEBUG("loop_sleep polling done");
+}
+
+/* 
+** loop_event - a wakeup event has happened, at the moment this means the button was pressed, I may expand it to cover other events, it actually updates the display to correspond to the current mode.
+** Waiting = none
+** Globals = 
+** Returns = 
+*/
+void loop_event(short dpin) {
+  if(dpin == dpin_mode_button) {
+    DEBUG("Mode button pressed");
+    next_mode_code();
+    if(g_mode == e_off) {
+      myseven._matrix.clear();
+      myseven._matrix.writeDisplay();
+    }
+  }
+  g_button_high = 0;
+}
+
 void loop() {
   if(g_mode == e_off) {
-    g_loop_delay_ms = e_loop_delay_off_interval;
-    ldelay(0,dpin_mode_button);
+    // loop forever really
+    loop_sleep(10000, dpin_mode_button);
   } else {
     // Display is on
-    check_mode_value();
-    g_loop_delay_ms = e_loop_delay_on_interval;
+    // check_mode_value();
     myrtc.loop();  //empty
     myseven.loop();  //empty
     g_draw_dots = !g_draw_dots;
-    DateTime now = display_time(); 
-    DEBUG("The time is currently=%d:%d", now.hour(), now.minute());
-    ldelay(0,dpin_mode_button);
+    display_time(); 
+    loop_sleep(g_loop_delay_ms, dpin_mode_button);
+    g_loop_delay_ms = SLEEP;
   }
 }
